@@ -91,8 +91,8 @@ const App = () => {
             <CssBaseline />
             <AppBar position="sticky" style={{ width: '100%', backgroundColor: '#3f51b5' }}>
                 <Toolbar>
-                    <Typography variant="h5" style={{ flexGrow: 1, fontWeight: 'bold' }}>
-                        Zepto Orders Plus
+                    <Typography variant="h6" style={{ fontSize: "1rem", flexGrow: 1, fontWeight: 'bold' }}>
+                        Zepto (Unofficial) Orders Plus
                     </Typography>
                     <Box display="flex" alignItems="center">
                         <Select

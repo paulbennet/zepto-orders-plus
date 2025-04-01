@@ -4,7 +4,8 @@
     "version": "1.0",
     "description": "Enhance your Zepto orders experience.",
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
     },
     "background": {
         "service_worker": "background.js"

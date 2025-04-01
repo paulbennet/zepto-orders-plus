@@ -15,7 +15,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 // Update the Product interface to include imageUrl
@@ -30,12 +30,30 @@ const App = () => {
     const [loading, setLoading] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth()); // Default to current month
     const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
+    const [summaryMonthYear, setSummaryMonthYear] = useState<{ month: number; year: number } | null>(null);
 
+    // Initialize the summary with default sorting by name in ascending order only once
+    useEffect(() => {
+        if (summary && !sortConfig) { // Only sort if sortConfig is null (initial state)
+            const sortedData = [...summary].sort((a, b) => a.name.localeCompare(b.name));
+            setSummary(sortedData);
+            setSortConfig({ key: 'name', direction: 'asc' });
+        }
+    }, [summary]);
+
+    // Reset sorting state during fetch summary process
     const fetchSummary = () => {
         setLoading(true);
+        setSortConfig(null); // Reset sorting state
         chrome.runtime.sendMessage({ action: 'fetchSummary', month: selectedMonth }, (response) => {
             if (response.success && response.data) {
-                setSummary(response.data);
+                const sortedData = [...response.data].sort((a, b) => a.name.localeCompare(b.name));
+                setSummary(sortedData);
+                setSortConfig({ key: 'name', direction: 'asc' }); // Set default sorting state
+
+                const currentYear = new Date().getFullYear();
+                const summaryYear = selectedMonth > new Date().getMonth() ? currentYear - 1 : currentYear;
+                setSummaryMonthYear({ month: selectedMonth, year: summaryYear });
             } else {
                 console.error('Error fetching summary:', response.error);
             }
@@ -82,8 +100,12 @@ const App = () => {
                                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
                                 style={{ width: '100%', padding: '10px', marginBottom: '20px' }}
                             >
-                                <option value={new Date().getMonth()}>Current Month</option>
-                                <option value={new Date().getMonth() - 1}>Previous Month</option>
+                                <option value={new Date().getMonth()}>
+                                    Current Month ({new Date().toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
+                                </option>
+                                <option value={new Date().getMonth() - 1}>
+                                    Previous Month ({new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
+                                </option>
                             </select>
                             <Button
                                 variant="contained"
@@ -102,6 +124,11 @@ const App = () => {
                         <Card>
                             <CardHeader title="Order Summary" />
                             <CardContent>
+                                {summaryMonthYear && (
+                                    <Typography variant="h6" gutterBottom>
+                                        Summary for {new Date(summaryMonthYear.year, summaryMonthYear.month).toLocaleString('default', { month: 'long' })}, {summaryMonthYear.year}
+                                    </Typography>
+                                )}
                                 <TableContainer component={Paper}>
                                     <Table>
                                         <TableHead>

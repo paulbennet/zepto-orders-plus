@@ -45,12 +45,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
           });
 
-          if (
-            orders.length === 0 ||
-            orders.some(
-              (order) => new Date(order.placedTime).getMonth() !== selectedMonth
-            )
-          ) {
+          const previousMonth = (selectedMonth - 1 + 12) % 12;
+          const hasPreviousMonthOrders = orders.some((order) => {
+            const orderDate = new Date(order.placedTime);
+            return (
+              orderDate.getMonth() === previousMonth &&
+              orderDate.getFullYear() === currentYear
+            );
+          });
+
+          if (orders.length === 0 || hasPreviousMonthOrders) {
             break;
           }
 

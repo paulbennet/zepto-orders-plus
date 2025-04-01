@@ -13,6 +13,16 @@
         "storage"
     ],
     "host_permissions": [
-        "*://*.zepto.com/*"
+        "*://*.zeptonow.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.zeptonow.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
     ]
 }

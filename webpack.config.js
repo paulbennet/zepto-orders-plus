@@ -25,6 +25,7 @@ module.exports = {
     minimize: true,
     minimizer: [new TerserPlugin()],
   },
+  devtool: "source-map",
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode: "static", // Generates a report.html file

@@ -1,5 +1,6 @@
 /// <reference types="chrome" />
 
+import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -14,6 +15,10 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Toolbar from '@mui/material/Toolbar';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -23,25 +28,16 @@ interface Product {
     name: string;
     count: number;
     imageUrl: string;
+    orderDates: string[];
 }
 
 const App = () => {
     const [summary, setSummary] = useState<Product[] | null>(null);
     const [loading, setLoading] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth()); // Default to current month
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
     const [summaryMonthYear, setSummaryMonthYear] = useState<{ month: number; year: number } | null>(null);
 
-    // Initialize the summary with default sorting by name in ascending order only once
-    useEffect(() => {
-        if (summary && !sortConfig) { // Only sort if sortConfig is null (initial state)
-            const sortedData = [...summary].sort((a, b) => a.name.localeCompare(b.name));
-            setSummary(sortedData);
-            setSortConfig({ key: 'name', direction: 'asc' });
-        }
-    }, [summary]);
-
-    // Reset sorting state during fetch summary process
     const fetchSummary = () => {
         setLoading(true);
         setSortConfig(null); // Reset sorting state
@@ -61,69 +57,72 @@ const App = () => {
         });
     };
 
-    const handleSort = (key: keyof Product) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-
-        if (summary) {
-            const sortedData = [...summary].sort((a, b) => {
-                if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
-                if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-            setSummary(sortedData);
-        }
-    };
-
     const renderSortableHeader = (label: string, key: keyof Product) => (
         <TableCell onClick={() => handleSort(key)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
             {label} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '▲' : '▼')}
         </TableCell>
     );
 
+    const handleSort = (key: keyof Product) => {
+        const newSortConfig: { key: keyof Product; direction: 'asc' | 'desc' } = sortConfig?.key === key
+            ? { key, direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' }
+            : { key, direction: 'asc' };
+
+        setSortConfig(newSortConfig);
+
+        if (summary) {
+            const sortedData = [...summary].sort((a, b) => {
+                if (key === 'count') {
+                    // Numeric comparison for count
+                    return newSortConfig.direction === 'asc' ? a[key] - b[key] : b[key] - a[key];
+                } else {
+                    // String comparison for other keys
+                    if (a[key] < b[key]) return newSortConfig.direction === 'asc' ? -1 : 1;
+                    if (a[key] > b[key]) return newSortConfig.direction === 'asc' ? 1 : -1;
+                    return 0;
+                }
+            });
+            setSummary(sortedData);
+        }
+    };
+
     return (
-        <Container>
+        <Container maxWidth={false} style={{ padding: 0 }}>
             <CssBaseline />
-            <Typography variant="h4" gutterBottom>
-                Zepto Orders Plus
-            </Typography>
-            <Grid container spacing={3}>
-                <Grid>
-                    <Card>
-                        <CardHeader title="Select Month" />
-                        <CardContent>
-                            <select
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                                style={{ width: '100%', padding: '10px', marginBottom: '20px' }}
-                            >
-                                <option value={new Date().getMonth()}>
-                                    Current Month ({new Date().toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
-                                </option>
-                                <option value={new Date().getMonth() - 1}>
-                                    Previous Month ({new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
-                                </option>
-                            </select>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={fetchSummary}
-                                disabled={loading}
-                                fullWidth
-                            >
-                                {loading ? "Loading..." : "Fetch Summary"}
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            <AppBar position="sticky" style={{ width: '100%', backgroundColor: '#3f51b5' }}>
+                <Toolbar>
+                    <Typography variant="h5" style={{ flexGrow: 1, fontWeight: 'bold' }}>
+                        Zepto Orders Plus
+                    </Typography>
+                    <Box display="flex" alignItems="center">
+                        <Select
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                            style={{ marginRight: '8px', color: 'white', backgroundColor: '#5c6bc0', fontSize: '0.875rem', padding: '4px 8px' }}
+                        >
+                            <MenuItem value={new Date().getMonth()}>
+                                Current Month ({new Date().toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
+                            </MenuItem>
+                            <MenuItem value={new Date().getMonth() - 1}>
+                                Previous Month ({new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleString('default', { month: 'long' })}, {new Date().getFullYear()})
+                            </MenuItem>
+                        </Select>
+                        <Button
+                            variant="contained"
+                            style={{ backgroundColor: '#ff4081', color: 'white', fontSize: '0.875rem', padding: '4px 8px' }}
+                            onClick={fetchSummary}
+                            disabled={loading}
+                        >
+                            {loading ? "Loading..." : "Fetch"}
+                        </Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+            <Grid container spacing={3} style={{ marginTop: '16px' }}>
                 <Grid>
                     {summary && (
-                        <Card>
-                            <CardHeader title="Order Summary" />
-                            <CardContent>
+                        <Grid container marginX={1}>
+                            <>
                                 {summaryMonthYear && (
                                     <Typography variant="h6" gutterBottom>
                                         Summary for {new Date(summaryMonthYear.year, summaryMonthYear.month).toLocaleString('default', { month: 'long' })}, {summaryMonthYear.year}
@@ -135,30 +134,42 @@ const App = () => {
                                             <TableRow>
                                                 <TableCell>#</TableCell>
                                                 {renderSortableHeader('Product', 'name')}
-                                                <TableCell>Image</TableCell>
                                                 {renderSortableHeader('Count', 'count')}
+                                                <TableCell>Ordered on Dates</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {summary.map((product, index) => (
-                                                <TableRow key={product.name}>
-                                                    <TableCell>{index + 1}</TableCell>
-                                                    <TableCell>{product.name}</TableCell>
-                                                    <TableCell>
-                                                        <img src={product.imageUrl} alt={product.name} style={{ width: '50px' }} />
-                                                    </TableCell>
-                                                    <TableCell>{product.count}</TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {summary.map((product, index) => {
+                                                // Extract unique dates from orderDates, sort them, and format as a string
+                                                const uniqueSortedDates = Array.from(new Set(product.orderDates.map(date => new Date(date).getDate()))).sort((a, b) => a - b).join(', ');
+                                                return (
+                                                    <TableRow key={product.name}>
+                                                        <TableCell>{index + 1}</TableCell>
+                                                        <TableCell>
+                                                            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                                                                <div>
+                                                                    <img src={product.imageUrl} alt={product.name} style={{ width: '30px', marginRight: '8px', verticalAlign: 'middle' }} />
+                                                                </div>
+                                                                <div>
+                                                                    {product.name}
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>{product.count}</TableCell>
+                                                        <TableCell>{uniqueSortedDates}</TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                            </CardContent>
-                        </Card>
+
+                            </>
+                        </Grid>
                     )}
                 </Grid>
             </Grid>
-        </Container >
+        </Container>
     );
 };
 

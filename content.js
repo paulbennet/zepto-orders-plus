@@ -35,11 +35,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
               if (aggregatedProducts[product.name]) {
                 aggregatedProducts[product.name].count += product.count;
+                aggregatedProducts[product.name].orderDates.push(
+                  order.placedTime
+                ); // Add order date to the list
               } else {
                 aggregatedProducts[product.name] = {
                   name: product.name,
                   count: product.count,
                   imageUrl: imageUrl,
+                  orderDates: [order.placedTime], // Initialize with a list containing the order date
                 };
               }
             });

@@ -1,0 +1,32 @@
+{
+  "name": "zepto-orders-plus",
+  "version": "1.0.0",
+  "description": "This is a simple Google Chrome extension. Follow the steps below to load it into Chrome:",
+  "main": "background.js",
+  "scripts": {
+    "build": "tsc && webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.0.1",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.313",
+    "terser-webpack-plugin": "^5.3.14",
+    "ts-loader": "^9.0.0",
+    "webpack": "^5.0.0",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^4.10.0"
+  },
+  "packageManager": "npm@latest"
+}

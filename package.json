@@ -4,7 +4,8 @@
   "description": "This is a simple Google Chrome extension. Follow the steps below to load it into Chrome:",
   "main": "background.js",
   "scripts": {
-    "build": "tsc && webpack"
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "keywords": [],
   "author": "",

@@ -33,3 +33,5 @@ module.exports = {
     }),
   ],
 };
+
+module.exports.watch = true;

@@ -1,7 +1,7 @@
 /// <reference types="chrome" />
 
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -193,6 +193,7 @@ const App = () => {
                                                                 <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                                                                     <div>
                                                                         <img
+                                                                            className="product-image"
                                                                             src={product.imageUrl}
                                                                             alt={product.name}
                                                                             style={{ width: '30px', marginRight: '8px', verticalAlign: 'middle', borderRadius: '5px', cursor: 'pointer' }}

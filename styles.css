@@ -1,0 +1,24 @@
+/* Add styles for the copy-icon and its child elements */
+.copy-icon {
+  margin-left: 8px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-icon button {
+  min-width: 24px;
+  padding: 0;
+}
+
+.copy-icon svg {
+  font-size: 16px;
+}
+
+/* Add hover effect for table rows to show the copy icon */
+.table-row:hover .copy-icon {
+  opacity: 1;
+}

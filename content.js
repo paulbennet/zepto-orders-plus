@@ -15,7 +15,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             `https://api.zeptonow.com/api/v2/order/?page_number=${page}`,
             { credentials: "include" }
           );
+
+          if (!response.ok) {
+            throw new Error(
+              `Network response was not ok: ${response.statusText}`
+            );
+          }
+
           const data = await response.json();
+
+          if (!data || !Array.isArray(data.orders)) {
+            throw new Error("Invalid API response structure");
+          }
+
           const orders = data.orders;
 
           // Filter orders for the selected month
@@ -28,6 +40,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           });
 
           filteredOrders.forEach((order) => {
+            if (
+              !order.productsNamesAndCounts ||
+              !Array.isArray(order.productsNamesAndCounts)
+            ) {
+              console.warn("Invalid products data in order", order);
+              return;
+            }
+
             order.productsNamesAndCounts.forEach((product) => {
               const imageUrl = product.image?.path
                 ? `https://cdn.zeptonow.com/production/${product.image.path}`
@@ -70,11 +90,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           data: Object.values(aggregatedProducts),
         });
       } catch (error) {
+        console.error("Error fetching orders:", error);
         sendResponse({ success: false, error: error.message });
       }
     };
 
     fetchOrders();
     return true; // Keep the message channel open for async response
+  } else {
+    sendResponse({ success: false, error: "Unknown action" });
   }
 });

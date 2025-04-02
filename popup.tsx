@@ -1,14 +1,21 @@
 /// <reference types="chrome" />
 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from '@mui/icons-material/Close';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,15 +23,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import { useEffect, useState } from 'react';
+import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import './styles.css';
 
 // Update the Product interface to include imageUrl
@@ -47,6 +49,7 @@ const App = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
     const [summaryMonthYear, setSummaryMonthYear] = useState<{ month: number; year: number } | null>(null);
+    const [openImage, setOpenImage] = useState<string | null>(null);
 
     const fetchSummary = () => {
         setLoading(true);
@@ -73,8 +76,8 @@ const App = () => {
         });
     };
 
-    const renderSortableHeader = (label: string, key: keyof Product) => (
-        <TableCell onClick={() => handleSort(key)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+    const renderSortableHeader = (label: string, key: keyof Product, style?: React.CSSProperties) => (
+        <TableCell onClick={() => handleSort(key)} style={{ cursor: 'pointer', fontWeight: 'bold', ...style }}>
             {label} {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '▲' : '▼')}
         </TableCell>
     );
@@ -100,6 +103,14 @@ const App = () => {
             });
             setSummary(sortedData);
         }
+    };
+
+    const handleImageClick = (imageUrl: string) => {
+        setOpenImage(imageUrl);
+    };
+
+    const handleCloseImage = () => {
+        setOpenImage(null);
     };
 
     return (
@@ -135,6 +146,23 @@ const App = () => {
                         </Box>
                     </Toolbar>
                 </AppBar>
+                <Dialog open={!!openImage} onClose={handleCloseImage} maxWidth="lg" fullWidth>
+                    <DialogContent style={{ position: 'relative', padding: 0 }}>
+                        <IconButton
+                            onClick={handleCloseImage}
+                            style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                        {openImage && (
+                            <img
+                                src={openImage}
+                                alt="Product"
+                                style={{ width: '100%', height: 'auto', display: 'block' }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
                 <Grid container spacing={3} style={{ marginTop: '16px' }}>
                     <Grid>
                         {summary && (
@@ -151,8 +179,8 @@ const App = () => {
                                                 <TableRow>
                                                     <TableCell>#</TableCell>
                                                     {renderSortableHeader('Product', 'name')}
-                                                    {renderSortableHeader('Count', 'count')}
-                                                    <TableCell>Ordered on Dates</TableCell>
+                                                    {renderSortableHeader('Count', 'count', { textAlign: 'right' })}
+                                                    <TableCell style={{ textAlign: 'right' }}>Ordered on Dates</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -164,17 +192,23 @@ const App = () => {
                                                             <TableCell>
                                                                 <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                                                                     <div>
-                                                                        <img src={product.imageUrl} alt={product.name} style={{ width: '30px', marginRight: '8px', verticalAlign: 'middle', borderRadius: '5px' }} />
+                                                                        <img
+                                                                            src={product.imageUrl}
+                                                                            alt={product.name}
+                                                                            style={{ width: '30px', marginRight: '8px', verticalAlign: 'middle', borderRadius: '5px', cursor: 'pointer' }}
+                                                                            onClick={() => handleImageClick(product.imageUrl)}
+                                                                        />
                                                                     </div>
                                                                     <div style={{ maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', position: 'relative' }}>
                                                                         <Tooltip title={product.name} placement="top">
                                                                             <span>{product.name}</span>
                                                                         </Tooltip>
                                                                     </div>
-                                                                    <div className="copy-icon">
+                                                                    <div className="copy-icon" style={{ backgroundColor: 'white', borderRadius: '50%', padding: '4px' }}>
                                                                         <Tooltip title="Copy to clipboard" placement="top">
                                                                             <Button
                                                                                 onClick={() => navigator.clipboard.writeText(product.name)}
+                                                                                style={{ minWidth: 'auto', padding: '4px' }}
                                                                             >
                                                                                 <ContentCopyIcon />
                                                                             </Button>
@@ -182,8 +216,14 @@ const App = () => {
                                                                     </div>
                                                                 </div>
                                                             </TableCell>
-                                                            <TableCell>{product.count}</TableCell>
-                                                            <TableCell>{uniqueSortedDates}</TableCell>
+                                                            <TableCell style={{ textAlign: 'right' }}>{product.count}</TableCell>
+                                                            <TableCell style={{ textAlign: 'right' }}>
+                                                                {uniqueSortedDates.split(', ').map((date, idx) => (
+                                                                    <Tooltip key={idx} title={new Date(product.orderDates[idx]).toLocaleString('default', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} placement="top">
+                                                                        <Chip label={date} style={{ margin: '2px', fontSize: '0.75rem', height: '20px', lineHeight: '20px' }} />
+                                                                    </Tooltip>
+                                                                ))}
+                                                            </TableCell>
                                                         </TableRow>
                                                     );
                                                 })}

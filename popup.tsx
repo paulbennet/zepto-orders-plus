@@ -175,7 +175,7 @@ const App = () => {
                                     )}
                                     <TableContainer component={Paper}>
                                         <Table>
-                                            <TableHead>
+                                            <TableHead style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'white' }}>
                                                 <TableRow>
                                                     <TableCell>#</TableCell>
                                                     {renderSortableHeader('Product', 'name')}

@@ -5,7 +5,8 @@
   "main": "background.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "package": "bash package-extension.sh"
   },
   "keywords": [],
   "author": "",

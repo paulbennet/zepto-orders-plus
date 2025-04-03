@@ -13,7 +13,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         while (true) {
           const response = await fetch(
             `https://api.zeptonow.com/api/v2/order/?page_number=${page}`,
-            { credentials: "include" }
+            {
+              headers: {
+                "request-signature":
+                  "chrome-extension-mpjoccodbkaipkldddemmdlladmldooc",
+              },
+              credentials: "include",
+            }
           );
 
           if (!response.ok) {

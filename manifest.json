@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Zepto (Unofficial) - Orders Plus",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Enhance your Zepto orders experience.",
     "action": {
         "default_popup": "popup.html",

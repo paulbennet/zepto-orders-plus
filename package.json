@@ -1,6 +1,6 @@
 {
   "name": "zepto-orders-plus",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "This is a simple Google Chrome extension. Follow the steps below to load it into Chrome:",
   "main": "background.js",
   "scripts": {

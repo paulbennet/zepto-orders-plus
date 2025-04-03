@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Define the output directory for the zip file
+DIST_DIR="dist"
+
+# Ensure the dist directory exists
+mkdir -p "$DIST_DIR"
+
 # Define the name of the zip file
-ZIP_FILE="zepto-orders-plus.zip"
+ZIP_FILE="$DIST_DIR/zepto-orders-plus.zip"
 
 # List of files and directories to include in the zip
 INCLUDE_FILES=(

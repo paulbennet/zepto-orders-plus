@@ -1,30 +1,21 @@
 {
-    "manifest_version": 3,
-    "name": "Zepto (Unofficial) - Orders Plus",
-    "version": "1.1",
-    "description": "Enhance your Zepto orders experience.",
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": "icon.png"
-    },
-    "background": {
-        "service_worker": "background.js"
-    },
-    "permissions": [
-        "storage",
-        "cookies"
-    ],
-    "host_permissions": [
-        "*://*.zeptonow.com/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*.zeptonow.com/*"
-            ],
-            "js": [
-                "content.js"
-            ]
-        }
-    ]
+  "manifest_version": 3,
+  "name": "Zepto (Unofficial) - Orders Plus",
+  "version": "1.1",
+  "description": "Enhance your Zepto orders experience.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "cookies"],
+  "host_permissions": ["*://*.zeptonow.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.zeptonow.com/*"],
+      "js": ["content.js"]
+    }
+  ]
 }

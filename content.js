@@ -19,12 +19,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                   "chrome-extension-mpjoccodbkaipkldddemmdlladmldooc",
               },
               credentials: "include",
-            }
+            },
           );
 
           if (!response.ok) {
             throw new Error(
-              `Network response was not ok: ${response.statusText}`
+              `Network response was not ok: ${response.statusText}`,
             );
           }
 
@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               if (aggregatedProducts[product.name]) {
                 aggregatedProducts[product.name].count += product.count;
                 aggregatedProducts[product.name].orderDates.push(
-                  order.placedTime
+                  order.placedTime,
                 ); // Add order date to the list
               } else {
                 aggregatedProducts[product.name] = {

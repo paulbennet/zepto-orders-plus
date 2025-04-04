@@ -1,6 +1,8 @@
 /* Add hover animation for product images */
 img.product-image {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 img.product-image:hover {

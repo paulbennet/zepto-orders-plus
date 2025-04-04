@@ -30,6 +30,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import '@fullcalendar/common/main.css';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -250,44 +252,25 @@ const App = () => {
         product.orderDates.map((orderDate) => ({
           title: product.name,
           start: orderDate,
-          imageUrl: product.imageUrl,
         }))
       ) || [];
 
     return (
       <Box marginTop={2}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Product</TableCell>
-                <TableCell>Image</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {events.map((event, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    {new Date(event.start).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{event.title}</TableCell>
-                  <TableCell>
-                    <img
-                      src={event.imageUrl}
-                      alt={event.title}
-                      style={{
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '5px',
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <FullCalendar
+          key={selectedMonth} // Add key to force re-render on month change
+          plugins={[dayGridPlugin]}
+          initialView="dayGridMonth"
+          events={events}
+          height="auto"
+          initialDate={
+            new Date(
+              summaryMonthYear?.year || new Date().getFullYear(),
+              summaryMonthYear?.month || new Date().getMonth(),
+              1
+            )
+          }
+        />
       </Box>
     );
   };

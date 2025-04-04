@@ -25,7 +25,7 @@ import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -50,6 +50,64 @@ const App = () => {
     const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
     const [summaryMonthYear, setSummaryMonthYear] = useState<{ month: number; year: number } | null>(null);
     const [openImage, setOpenImage] = useState<string | null>(null);
+    const [isSupportedDomain, setIsSupportedDomain] = useState(false);
+    const [loginRequired, setLoginRequired] = useState(false);
+
+    useEffect(() => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const url = new URL(tabs[0].url || '');
+
+            const isSupported = url.hostname.endsWith('zeptonow.com');
+            setIsSupportedDomain(isSupported);
+
+            if (isSupported) {
+                chrome.cookies.get({ url: url.origin, name: 'user_id' }, (cookie) => {
+                    if (!cookie || !cookie.value) {
+                        setLoginRequired(true);
+                    } else {
+                        setLoginRequired(false);
+                    }
+                });
+            }
+        });
+    }, []);
+
+    if (!isSupportedDomain) {
+        return (
+            <ThemeProvider theme={theme}>
+                <Container maxWidth={false} style={{ padding: 0 }}>
+                    <CssBaseline />
+                    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
+                        <Typography variant="h6" gutterBottom>
+                            This extension only works on zeptonow.com.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => window.open('https://www.zeptonow.com', '_blank')}
+                        >
+                            Open ZeptoNow
+                        </Button>
+                    </Box>
+                </Container>
+            </ThemeProvider>
+        );
+    }
+
+    if (loginRequired) {
+        return (
+            <ThemeProvider theme={theme}>
+                <Container maxWidth={false} style={{ padding: 0 }}>
+                    <CssBaseline />
+                    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
+                        <Typography variant="h6" gutterBottom>
+                            Please log in to your ZeptoNow account to use this extension.
+                        </Typography>
+                    </Box>
+                </Container>
+            </ThemeProvider>
+        );
+    }
 
     const fetchSummary = () => {
         setLoading(true);

@@ -382,12 +382,12 @@ const App = () => {
           </TableRow>
         );
       }) || (
-        <TableRow>
-          <TableCell colSpan={4} style={{ textAlign: "center" }}>
-            No data available
-          </TableCell>
-        </TableRow>
-      )}
+          <TableRow>
+            <TableCell colSpan={4} style={{ textAlign: "center" }}>
+              No data available
+            </TableCell>
+          </TableRow>
+        )}
     </TableBody>
   );
 

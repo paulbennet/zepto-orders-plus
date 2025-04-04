@@ -28,8 +28,8 @@ import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
+
+import '@fullcalendar/common/main.css';
 
 import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -53,7 +53,6 @@ const theme = createTheme({
 
 const App = () => {
   const [summary, setSummary] = useState<Product[] | null>(null);
-  const [loading, setLoading] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Product;
@@ -71,7 +70,6 @@ const App = () => {
 
   const fetchSummary = () => {
     setIsFetching(true); // Disable month selection
-    setLoading(true);
     setSortConfig(null); // Reset sorting state
     chrome.runtime.sendMessage(
       { action: 'fetchSummary', month: selectedMonth },
@@ -107,7 +105,7 @@ const App = () => {
           setSummary(null);
           setSummaryMonthYear(null);
         }
-        setLoading(false);
+
         setIsFetching(false); // Re-enable month selection
       }
     );
@@ -246,40 +244,53 @@ const App = () => {
     setOpenImage(null);
   };
 
-  const renderCalendarView = () => (
-    <Box marginTop={2}>
-      <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
-        headerToolbar={false} // Remove navigation options
-        initialDate={new Date(new Date().getFullYear(), selectedMonth, 1)} // Set the initial date based on the selected month
-        events={
-          summary?.flatMap((product) =>
-            product.orderDates.map((orderDate) => ({
-              title: product.name,
-              start: orderDate,
-              extendedProps: { imageUrl: product.imageUrl },
-            }))
-          ) || []
-        } // Ensure events is never undefined
-        eventContent={(eventInfo) => (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img
-              src={eventInfo.event.extendedProps.imageUrl}
-              alt={eventInfo.event.title}
-              style={{
-                width: '20px',
-                height: '20px',
-                marginRight: '4px',
-                borderRadius: '50%',
-              }}
-            />
-            <span>{eventInfo.event.title}</span>
-          </div>
-        )}
-      />
-    </Box>
-  );
+  const renderCalendarView = () => {
+    const events =
+      summary?.flatMap((product) =>
+        product.orderDates.map((orderDate) => ({
+          title: product.name,
+          start: orderDate,
+          imageUrl: product.imageUrl,
+        }))
+      ) || [];
+
+    return (
+      <Box marginTop={2}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Product</TableCell>
+                <TableCell>Image</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {events.map((event, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    {new Date(event.start).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{event.title}</TableCell>
+                  <TableCell>
+                    <img
+                      src={event.imageUrl}
+                      alt={event.title}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '5px',
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    );
+  };
 
   const renderTableBody = () => (
     <TableBody>

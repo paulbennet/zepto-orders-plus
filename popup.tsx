@@ -27,6 +27,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles.css';
 
 // Update the Product interface to include imageUrl
@@ -115,6 +117,7 @@ const App = () => {
         chrome.runtime.sendMessage({ action: 'fetchSummary', month: selectedMonth }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error('Runtime error:', chrome.runtime.lastError.message);
+                toast.error('An error occurred while fetching the summary. Please try again.');
                 setSummary(null);
                 setSummaryMonthYear(null);
             } else if (response && response.success && response.data) {
@@ -127,6 +130,7 @@ const App = () => {
                 setSummaryMonthYear({ month: selectedMonth, year: summaryYear });
             } else {
                 console.error('Error fetching summary:', response?.error || 'Unknown error');
+                toast.error(response?.error || 'Failed to fetch the summary. Please try again.');
                 setSummary(null);
                 setSummaryMonthYear(null);
             }
@@ -175,6 +179,7 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <Container maxWidth={false} style={{ padding: 0 }}>
                 <CssBaseline />
+                <ToastContainer position="bottom-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
                 <AppBar position="sticky" style={{ width: '100%', backgroundColor: '#3f51b5' }}>
                     <Toolbar>
                         <Typography variant="h6" style={{ fontSize: "1rem", flexGrow: 1, fontWeight: 'bold' }}>

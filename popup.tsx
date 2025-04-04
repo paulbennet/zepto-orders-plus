@@ -1,41 +1,41 @@
 /// <reference types="chrome" />
 
-import CloseIcon from "@mui/icons-material/Close";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import TableChartIcon from "@mui/icons-material/TableChart";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import Chip from "@mui/material/Chip";
-import Container from "@mui/material/Container";
-import CssBaseline from "@mui/material/CssBaseline";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
-import Select from "@mui/material/Select";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
+import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Chip from '@mui/material/Chip';
+import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
 
-import { useState, useEffect } from "react";
-import { createRoot } from "react-dom/client";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./styles.css";
+import { useState, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles.css';
 
 // Update the Product interface to include imageUrl
 interface Product {
@@ -57,7 +57,7 @@ const App = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Product;
-    direction: "asc" | "desc";
+    direction: 'asc' | 'desc';
   } | null>(null);
   const [summaryMonthYear, setSummaryMonthYear] = useState<{
     month: number;
@@ -66,7 +66,7 @@ const App = () => {
   const [openImage, setOpenImage] = useState<string | null>(null);
   const [isSupportedDomain, setIsSupportedDomain] = useState(false);
   const [loginRequired, setLoginRequired] = useState(false);
-  const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
+  const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
   const [isFetching, setIsFetching] = useState(false); // State to track fetching progress
 
   const fetchSummary = () => {
@@ -74,21 +74,21 @@ const App = () => {
     setLoading(true);
     setSortConfig(null); // Reset sorting state
     chrome.runtime.sendMessage(
-      { action: "fetchSummary", month: selectedMonth },
+      { action: 'fetchSummary', month: selectedMonth },
       (response) => {
         if (chrome.runtime.lastError) {
-          console.error("Runtime error:", chrome.runtime.lastError.message);
+          console.error('Runtime error:', chrome.runtime.lastError.message);
           toast.error(
-            "An error occurred while fetching the summary. Please try again.",
+            'An error occurred while fetching the summary. Please try again.'
           );
           setSummary(null);
           setSummaryMonthYear(null);
         } else if (response && response.success && response.data) {
           const sortedData = [...response.data].sort((a, b) =>
-            a.name.localeCompare(b.name),
+            a.name.localeCompare(b.name)
           );
           setSummary(sortedData);
-          setSortConfig({ key: "name", direction: "asc" }); // Set default sorting state
+          setSortConfig({ key: 'name', direction: 'asc' }); // Set default sorting state
 
           const currentYear = new Date().getFullYear();
           const summaryYear =
@@ -98,30 +98,30 @@ const App = () => {
           setSummaryMonthYear({ month: selectedMonth, year: summaryYear });
         } else {
           console.error(
-            "Error fetching summary:",
-            response?.error || "Unknown error",
+            'Error fetching summary:',
+            response?.error || 'Unknown error'
           );
           toast.error(
-            response?.error || "Failed to fetch the summary. Please try again.",
+            response?.error || 'Failed to fetch the summary. Please try again.'
           );
           setSummary(null);
           setSummaryMonthYear(null);
         }
         setLoading(false);
         setIsFetching(false); // Re-enable month selection
-      },
+      }
     );
   };
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const url = new URL(tabs[0].url || "");
+      const url = new URL(tabs[0].url || '');
 
-      const isSupported = url.hostname.endsWith("zeptonow.com");
+      const isSupported = url.hostname.endsWith('zeptonow.com');
       setIsSupportedDomain(isSupported);
 
       if (isSupported) {
-        chrome.cookies.get({ url: url.origin, name: "user_id" }, (cookie) => {
+        chrome.cookies.get({ url: url.origin, name: 'user_id' }, (cookie) => {
           if (!cookie || !cookie.value) {
             setLoginRequired(true);
           } else {
@@ -159,7 +159,7 @@ const App = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => window.open("https://www.zeptonow.com", "_blank")}
+              onClick={() => window.open('https://www.zeptonow.com', '_blank')}
             >
               Open ZeptoNow
             </Button>
@@ -193,44 +193,44 @@ const App = () => {
   const handleMonthChange = (month: number) => {
     setSelectedMonth(month);
     fetchSummary(); // Trigger fetch on month change
-    setViewMode("table"); // Revert to table view on month change
+    setViewMode('table'); // Revert to table view on month change
   };
 
   const renderSortableHeader = (
     label: string,
     key: keyof Product,
-    style?: React.CSSProperties,
+    style?: React.CSSProperties
   ) => (
     <TableCell
       onClick={() => handleSort(key)}
-      style={{ cursor: "pointer", fontWeight: "bold", ...style }}
+      style={{ cursor: 'pointer', fontWeight: 'bold', ...style }}
     >
-      {label}{" "}
-      {sortConfig?.key === key && (sortConfig.direction === "asc" ? "▲" : "▼")}
+      {label}{' '}
+      {sortConfig?.key === key && (sortConfig.direction === 'asc' ? '▲' : '▼')}
     </TableCell>
   );
 
   const handleSort = (key: keyof Product) => {
-    const newSortConfig: { key: keyof Product; direction: "asc" | "desc" } =
+    const newSortConfig: { key: keyof Product; direction: 'asc' | 'desc' } =
       sortConfig?.key === key
-        ? { key, direction: sortConfig.direction === "asc" ? "desc" : "asc" }
-        : { key, direction: "asc" };
+        ? { key, direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' }
+        : { key, direction: 'asc' };
 
     setSortConfig(newSortConfig);
 
     if (summary) {
       const sortedData = [...summary].sort((a, b) => {
-        if (key === "count") {
+        if (key === 'count') {
           // Numeric comparison for count
-          return newSortConfig.direction === "asc"
+          return newSortConfig.direction === 'asc'
             ? a[key] - b[key]
             : b[key] - a[key];
         } else {
           // String comparison for other keys
           if (a[key] < b[key])
-            return newSortConfig.direction === "asc" ? -1 : 1;
+            return newSortConfig.direction === 'asc' ? -1 : 1;
           if (a[key] > b[key])
-            return newSortConfig.direction === "asc" ? 1 : -1;
+            return newSortConfig.direction === 'asc' ? 1 : -1;
           return 0;
         }
       });
@@ -259,19 +259,19 @@ const App = () => {
               title: product.name,
               start: orderDate,
               extendedProps: { imageUrl: product.imageUrl },
-            })),
+            }))
           ) || []
         } // Ensure events is never undefined
         eventContent={(eventInfo) => (
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <img
               src={eventInfo.event.extendedProps.imageUrl}
               alt={eventInfo.event.title}
               style={{
-                width: "20px",
-                height: "20px",
-                marginRight: "4px",
-                borderRadius: "50%",
+                width: '20px',
+                height: '20px',
+                marginRight: '4px',
+                borderRadius: '50%',
               }}
             />
             <span>{eventInfo.event.title}</span>
@@ -285,19 +285,19 @@ const App = () => {
     <TableBody>
       {summary?.map((product, index) => {
         const uniqueSortedDates = Array.from(
-          new Set(product.orderDates.map((date) => new Date(date).getDate())),
+          new Set(product.orderDates.map((date) => new Date(date).getDate()))
         )
           .sort((a, b) => a - b)
-          .join(", ");
+          .join(', ');
         return (
           <TableRow key={product.name} className="table-row">
             <TableCell>{index + 1}</TableCell>
             <TableCell>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  position: "relative",
+                  display: 'flex',
+                  alignItems: 'center',
+                  position: 'relative',
                 }}
               >
                 <div>
@@ -306,22 +306,22 @@ const App = () => {
                     src={product.imageUrl}
                     alt={product.name}
                     style={{
-                      width: "30px",
-                      marginRight: "8px",
-                      verticalAlign: "middle",
-                      borderRadius: "5px",
-                      cursor: "pointer",
+                      width: '30px',
+                      marginRight: '8px',
+                      verticalAlign: 'middle',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
                     }}
                     onClick={() => handleImageClick(product.imageUrl)}
                   />
                 </div>
                 <div
                   style={{
-                    maxWidth: "150px",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    position: "relative",
+                    maxWidth: '150px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    position: 'relative',
                   }}
                 >
                   <Tooltip title={product.name} placement="top">
@@ -331,9 +331,9 @@ const App = () => {
                 <div
                   className="copy-icon"
                   style={{
-                    backgroundColor: "white",
-                    borderRadius: "50%",
-                    padding: "4px",
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    padding: '4px',
                   }}
                 >
                   <Tooltip title="Copy to clipboard" placement="top">
@@ -341,7 +341,7 @@ const App = () => {
                       onClick={() =>
                         navigator.clipboard.writeText(product.name)
                       }
-                      style={{ minWidth: "auto", padding: "4px" }}
+                      style={{ minWidth: 'auto', padding: '4px' }}
                     >
                       <ContentCopyIcon />
                     </Button>
@@ -349,31 +349,31 @@ const App = () => {
                 </div>
               </div>
             </TableCell>
-            <TableCell style={{ textAlign: "right" }}>
+            <TableCell style={{ textAlign: 'right' }}>
               {product.count}
             </TableCell>
-            <TableCell style={{ textAlign: "right" }}>
-              {uniqueSortedDates.split(", ").map((date, idx) => (
+            <TableCell style={{ textAlign: 'right' }}>
+              {uniqueSortedDates.split(', ').map((date, idx) => (
                 <Tooltip
                   key={idx}
                   title={new Date(product.orderDates[idx]).toLocaleString(
-                    "default",
+                    'default',
                     {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    },
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }
                   )}
                   placement="top"
                 >
                   <Chip
                     label={date}
                     style={{
-                      margin: "2px",
-                      fontSize: "0.75rem",
-                      height: "20px",
-                      lineHeight: "20px",
+                      margin: '2px',
+                      fontSize: '0.75rem',
+                      height: '20px',
+                      lineHeight: '20px',
                     }}
                   />
                 </Tooltip>
@@ -382,12 +382,12 @@ const App = () => {
           </TableRow>
         );
       }) || (
-          <TableRow>
-            <TableCell colSpan={4} style={{ textAlign: "center" }}>
-              No data available
-            </TableCell>
-          </TableRow>
-        )}
+        <TableRow>
+          <TableCell colSpan={4} style={{ textAlign: 'center' }}>
+            No data available
+          </TableCell>
+        </TableRow>
+      )}
     </TableBody>
   );
 
@@ -396,16 +396,16 @@ const App = () => {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      style={{ marginBottom: "8px" }}
-      width={"100%"}
+      style={{ marginBottom: '8px' }}
+      width={'100%'}
       padding={1}
     >
       <Typography variant="h6">
-        Summary for{" "}
+        Summary for{' '}
         {new Date(
           summaryMonthYear?.year || new Date().getFullYear(),
-          summaryMonthYear?.month || new Date().getMonth(),
-        ).toLocaleString("default", { month: "long" })}
+          summaryMonthYear?.month || new Date().getMonth()
+        ).toLocaleString('default', { month: 'long' })}
         , {summaryMonthYear?.year || new Date().getFullYear()}
       </Typography>
       <Box
@@ -417,15 +417,15 @@ const App = () => {
         <ButtonGroup
           variant="contained"
           color="primary"
-          style={{ marginRight: "8px" }}
+          style={{ marginRight: '8px' }}
         >
           <Tooltip title="Table View" placement="top">
             <Button
               style={{
-                backgroundColor: viewMode === "table" ? "#ff4081" : "#5c6bc0",
-                color: "white",
+                backgroundColor: viewMode === 'table' ? '#ff4081' : '#5c6bc0',
+                color: 'white',
               }}
-              onClick={() => setViewMode("table")}
+              onClick={() => setViewMode('table')}
             >
               <TableChartIcon />
             </Button>
@@ -434,10 +434,10 @@ const App = () => {
             <Button
               style={{
                 backgroundColor:
-                  viewMode === "calendar" ? "#ff4081" : "#5c6bc0",
-                color: "white",
+                  viewMode === 'calendar' ? '#ff4081' : '#5c6bc0',
+                color: 'white',
               }}
-              onClick={() => setViewMode("calendar")}
+              onClick={() => setViewMode('calendar')}
             >
               <CalendarTodayIcon />
             </Button>
@@ -464,16 +464,16 @@ const App = () => {
         />
         <AppBar
           position="sticky"
-          style={{ width: "100%", backgroundColor: "#3f51b5" }}
+          style={{ width: '100%', backgroundColor: '#3f51b5' }}
         >
           <Toolbar>
             <Typography
               variant="h6"
               style={{
-                fontSize: "1rem",
+                fontSize: '1rem',
                 flexGrow: 1,
-                fontWeight: "bold",
-                margin: "0 16px",
+                fontWeight: 'bold',
+                margin: '0 16px',
               }}
             >
               Zepto (Unofficial) Orders Plus
@@ -485,42 +485,42 @@ const App = () => {
             >
               <MenuItem value={new Date().getMonth()}>
                 Current Month (
-                {new Date().toLocaleString("default", { month: "long" })},{" "}
+                {new Date().toLocaleString('default', { month: 'long' })},{' '}
                 {new Date().getFullYear()})
               </MenuItem>
               <MenuItem value={new Date().getMonth() - 1}>
                 Previous Month (
                 {new Date(
-                  new Date().setMonth(new Date().getMonth() - 1),
-                ).toLocaleString("default", { month: "long" })}
+                  new Date().setMonth(new Date().getMonth() - 1)
+                ).toLocaleString('default', { month: 'long' })}
                 , {new Date().getFullYear()})
               </MenuItem>
             </Select>
           </Toolbar>
         </AppBar>
-        <Grid container spacing={3} style={{ marginTop: "16px" }}>
+        <Grid container spacing={3} style={{ marginTop: '16px' }}>
           <Grid>
             {summary && (
               <Grid container marginX={1}>
                 {renderSectionHeader()}
-                {viewMode === "table" ? (
+                {viewMode === 'table' ? (
                   <TableContainer component={Paper}>
                     <Table>
                       <TableHead
                         style={{
-                          position: "sticky",
+                          position: 'sticky',
                           top: 0,
                           zIndex: 1,
-                          backgroundColor: "white",
+                          backgroundColor: 'white',
                         }}
                       >
                         <TableRow>
                           <TableCell>#</TableCell>
-                          {renderSortableHeader("Product", "name")}
-                          {renderSortableHeader("Count", "count", {
-                            textAlign: "right",
+                          {renderSortableHeader('Product', 'name')}
+                          {renderSortableHeader('Count', 'count', {
+                            textAlign: 'right',
                           })}
-                          <TableCell style={{ textAlign: "right" }}>
+                          <TableCell style={{ textAlign: 'right' }}>
                             Ordered on Dates
                           </TableCell>
                         </TableRow>
@@ -541,10 +541,10 @@ const App = () => {
           maxWidth="lg"
           fullWidth
         >
-          <DialogContent style={{ position: "relative", padding: 0 }}>
+          <DialogContent style={{ position: 'relative', padding: 0 }}>
             <IconButton
               onClick={handleCloseImage}
-              style={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
+              style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
             >
               <CloseIcon />
             </IconButton>
@@ -552,7 +552,7 @@ const App = () => {
               <img
                 src={openImage}
                 alt="Product"
-                style={{ width: "100%", height: "auto", display: "block" }}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
               />
             )}
           </DialogContent>
@@ -562,4 +562,4 @@ const App = () => {
   );
 };
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById('root')!).render(<App />);

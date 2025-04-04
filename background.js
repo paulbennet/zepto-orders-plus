@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Received message in background script:", message);
+  console.log('Received message in background script:', message);
 
-  if (message.action === "fetchSummary") {
+  if (message.action === 'fetchSummary') {
     // Forward the message to the content script
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse(response);
         });
       } else {
-        sendResponse({ success: false, error: "No active tab found" });
+        sendResponse({ success: false, error: 'No active tab found' });
       }
     });
 

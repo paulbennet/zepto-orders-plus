@@ -1,8 +1,8 @@
-console.log("Content script is loaded");
+console.log('Content script is loaded');
 
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "fetchSummary") {
+  if (message.action === 'fetchSummary') {
     const aggregatedProducts = {};
     const selectedMonth = message.month; // Receive selected month from popup
     const currentYear = new Date().getFullYear();
@@ -15,23 +15,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             `https://api.zeptonow.com/api/v2/order/?page_number=${page}`,
             {
               headers: {
-                "request-signature":
-                  "chrome-extension-mpjoccodbkaipkldddemmdlladmldooc",
+                'request-signature':
+                  'chrome-extension-mpjoccodbkaipkldddemmdlladmldooc',
               },
-              credentials: "include",
-            },
+              credentials: 'include',
+            }
           );
 
           if (!response.ok) {
             throw new Error(
-              `Network response was not ok: ${response.statusText}`,
+              `Network response was not ok: ${response.statusText}`
             );
           }
 
           const data = await response.json();
 
           if (!data || !Array.isArray(data.orders)) {
-            throw new Error("Invalid API response structure");
+            throw new Error('Invalid API response structure');
           }
 
           const orders = data.orders;
@@ -50,19 +50,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               !order.productsNamesAndCounts ||
               !Array.isArray(order.productsNamesAndCounts)
             ) {
-              console.warn("Invalid products data in order", order);
+              console.warn('Invalid products data in order', order);
               return;
             }
 
             order.productsNamesAndCounts.forEach((product) => {
               const imageUrl = product.image?.path
                 ? `https://cdn.zeptonow.com/production/${product.image.path}`
-                : "";
+                : '';
 
               if (aggregatedProducts[product.name]) {
                 aggregatedProducts[product.name].count += product.count;
                 aggregatedProducts[product.name].orderDates.push(
-                  order.placedTime,
+                  order.placedTime
                 ); // Add order date to the list
               } else {
                 aggregatedProducts[product.name] = {
@@ -96,7 +96,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           data: Object.values(aggregatedProducts),
         });
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
         sendResponse({ success: false, error: error.message });
       }
     };
@@ -104,6 +104,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     fetchOrders();
     return true; // Keep the message channel open for async response
   } else {
-    sendResponse({ success: false, error: "Unknown action" });
+    sendResponse({ success: false, error: 'Unknown action' });
   }
 });

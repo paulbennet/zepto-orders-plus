@@ -247,21 +247,44 @@ const App = () => {
   };
 
   const renderCalendarView = () => {
-    const events =
-      summary?.flatMap((product) =>
-        product.orderDates.map((orderDate) => ({
-          title: product.name,
-          start: orderDate,
-        }))
-      ) || [];
+    type EventProduct = {
+      name: string;
+      imageUrl: string;
+      count: number;
+    };
+
+    const events: Record<string, EventProduct[]> = (summary || []).reduce(
+      (acc: Record<string, EventProduct[]>, product) => {
+        product.orderDates.forEach((orderDate) => {
+          const dateKey = new Date(orderDate).toISOString().split('T')[0];
+          if (!acc[dateKey]) {
+            acc[dateKey] = [];
+          }
+          const existingProduct = acc[dateKey].find(
+            (item) => item.name === product.name
+          );
+          if (existingProduct) {
+            existingProduct.count += product.count;
+          } else {
+            acc[dateKey].push({
+              name: product.name,
+              imageUrl: product.imageUrl,
+              count: product.count,
+            });
+          }
+        });
+        return acc;
+      },
+      {}
+    );
 
     return (
       <Box marginTop={2}>
         <FullCalendar
-          key={selectedMonth} // Add key to force re-render on month change
-          plugins={[dayGridPlugin]}
+          key={selectedMonth}
+          plugins={[dayGridPlugin]} // Removed navigation options
           initialView="dayGridMonth"
-          events={events}
+          events={[]}
           height="auto"
           initialDate={
             new Date(
@@ -270,6 +293,34 @@ const App = () => {
               1
             )
           }
+          headerToolbar={false} // Disable navigation options
+          dayCellContent={(arg) => {
+            const dateKey = arg.date.toISOString().split('T')[0];
+            const products = events?.[dateKey] || [];
+            return (
+              <div style={{ textAlign: 'right' }}>
+                <div>{arg.dayNumberText}</div>
+                {products.map((product: EventProduct, index: number) => (
+                  <Chip
+                    key={index}
+                    avatar={
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                        }}
+                      />
+                    }
+                    label={`${product.count}x`}
+                    style={{ margin: '2px', fontSize: '0.75rem' }}
+                  />
+                ))}
+              </div>
+            );
+          }}
         />
       </Box>
     );
